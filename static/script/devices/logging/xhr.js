@@ -1,7 +1,7 @@
 /**
  * @fileOverview Requirejs module containing base antie.devices.logging.xhr class.
  * @preserve Copyright (c) 2013-present British Broadcasting Corporation. All rights reserved.
- * @license See https://github.com/bbc/tal/blob/master/LICENSE for full licence
+ * @license See https://github.com/fmtvp/tal/blob/master/LICENSE for full licence
  */
 
 //Logs to via an XML HTTP Request ( XHR )
@@ -12,7 +12,7 @@ define(
         'antie/runtimecontext',
         'antie/devices/device'
     ],
-    function(Module, RuntimeContext, Device) {
+    function( Module, RuntimeContext, Device) {
         'use strict';
 
         function zeroFill(number, width) {
@@ -56,7 +56,9 @@ define(
         function xhrPost(url, opts, messageObject) {
 
             var http = new XMLHttpRequest();
-            var jsonMessage = JSON.stringify(messageObject);
+
+            var device = RuntimeContext.getCurrentApplication().getDevice();
+            var jsonMessage = device.encodeJson( messageObject );
 
             http.open('POST', url, true);
 

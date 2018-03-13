@@ -1,7 +1,7 @@
 /**
  * @fileOverview Requirejs modifier for cookie based storage
  * @preserve Copyright (c) 2013-present British Broadcasting Corporation. All rights reserved.
- * @license See https://github.com/bbc/tal/blob/master/LICENSE for full licence
+ * @license See https://github.com/fmtvp/tal/blob/master/LICENSE for full licence
  */
 
 define(
@@ -88,9 +88,7 @@ define(
                 var cookie = readCookie(namespace);
 
                 if(cookie) {
-                    try {
-                        this._valueCache = JSON.parse(cookie);
-                    } catch (e) { /* couldn't parse cookie, just ignore it */ }
+                    this._valueCache = Device.prototype.decodeJson(cookie);
                     if(this._valueCache) {
                         this._save();
                     } else {
@@ -119,7 +117,7 @@ define(
                 if(this.isEmpty()) {
                     eraseCookie(this._namespace, this._opts);
                 } else {
-                    var json = JSON.stringify(this._valueCache);
+                    var json = Device.prototype.encodeJson(this._valueCache);
                     createCookie(this._namespace, json, undefined, this._opts);
                 }
             }

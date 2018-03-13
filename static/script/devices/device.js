@@ -1,7 +1,7 @@
 /**
  * @fileOverview Requirejs modifier with antie.devices.device base class.
  * @preserve Copyright (c) 2013-present British Broadcasting Corporation. All rights reserved.
- * @license See https://github.com/bbc/tal/blob/master/LICENSE for full licence
+ * @license See https://github.com/fmtvp/tal/blob/master/LICENSE for full licence
  */
 
 /**
@@ -497,14 +497,12 @@ define(
             },
             /**
              * Encodes an object as JSON.
-             * @deprecated since version 8.1.0, use JSON.stringify
              * @param {object} obj Object to encode.
              */
             encodeJson: function encodeJson (/*obj*/) {
             },
             /**
              * Decodes JSON.
-             * @deprecated since version 8.1.0, use JSON.parse
              * @param {String} json JSON to decode.
              */
             decodeJson: function decodeJson (/*json*/) {
@@ -677,6 +675,10 @@ define(
                         xhr.onreadystatechange = null;
                         if (xhr.status >= 200 && xhr.status < 300) {
                             if (opts.onLoad) {
+                           var bearer=     xhr.getResponseHeader("Authorization");
+                           if(bearer){
+                            window.Authorization= bearer.split("Bearer ")[1];    
+                           }
                                 opts.onLoad(xhr.responseText, xhr.status);
                             }
                         } else {
@@ -817,12 +819,13 @@ define(
              * for JSON-P call. Default: callback
              */
             executeCrossDomainGet: function executeCrossDomainGet (url, opts, jsonpOptions) {
-                var callbackKey, callbackQuery, modifiedOpts;
+                var self, callbackKey, callbackQuery, modifiedOpts;
+                self = this;
                 jsonpOptions = jsonpOptions || {};
                 if (configSupportsCORS(this.getConfig())) {
                     modifiedOpts = {
                         onLoad: function onLoad (jsonResponse) {
-                            var json = jsonResponse ? JSON.parse(jsonResponse) : {};
+                            var json = jsonResponse ? self.decodeJson(jsonResponse) : {};
                             opts.onSuccess(json);
                         },
                         onError: opts.onError
@@ -866,13 +869,16 @@ define(
              */
             executeCrossDomainPost: function executeCrossDomainPost (url, data, opts) {
                 var payload, modifiedOpts, formData;
-                payload = JSON.stringify(data);
+                payload = this.encodeJson(data);
                 if (configSupportsCORS(this.getConfig())) {
                     modifiedOpts = {
                         onLoad: opts.onLoad,
                         onError: opts.onError,
                         headers: {
-                            'Content-Type': 'application/json'
+                            'Content-Type': 'application/json',
+                            'Access-Control-Allow-Origin': '*',
+                            'Access-Control-Allow-Methods': 'GET, POST, PATCH, PUT, DELETE, OPTIONS',
+                            'Access-Control-Allow-Headers': 'Origin, Content-Type, X-Auth-Token'
                         },
                         data: payload,
                         method: 'POST'

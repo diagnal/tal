@@ -1,6 +1,6 @@
 /**
  * @preserve Copyright (c) 2013-present British Broadcasting Corporation. All rights reserved.
- * @license See https://github.com/bbc/tal/blob/master/LICENSE for full licence
+ * @license See https://github.com/fmtvp/tal/blob/master/LICENSE for full licence
  */
 
 define(
@@ -24,7 +24,7 @@ define(
             getItem: function getItem (key) {
                 if (this._storage.hasKey(key)) {
                     var value = this._storage.lookup(key);
-                    var jsonifiedValue = JSON.parse(value);
+                    var jsonifiedValue = Device.prototype.decodeJson(value);
 
                     if (jsonifiedValue === null) {
                         return undefined;
@@ -36,7 +36,8 @@ define(
             },
 
             setItem: function setItem (key, value) {
-                this._storage.insert(key, JSON.stringify(value));
+                var stringifiedValue = Device.prototype.encodeJson(value);
+                this._storage.insert(key, stringifiedValue);
             },
 
             removeItem: function removeItem (key) {

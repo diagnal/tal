@@ -1,7 +1,7 @@
 /**
  * @fileOverview Requirejs module containing the antie.widgets.carousel.carouselcore class.
  * @preserve Copyright (c) 2013-present British Broadcasting Corporation. All rights reserved.
- * @license See https://github.com/bbc/tal/blob/master/LICENSE for full licence
+ * @license See https://github.com/fmtvp/tal/blob/master/LICENSE for full licence
  */
 
 define(
@@ -94,7 +94,7 @@ define(
 
             /**
              * Manually sets lengths of elements for movement calculations - useful for elements which change size while moving.
-             * @param {(Number|Number[])} lengths If provided with a number all lengths will be set equal to this number
+             * @param lengths {number} | {Array} If provided with a number all lengths will be set equal to this number
              * If provided with an array, the lengths will be set with the corresponding widgets (so the first number will be used
              * for the first widget's length, etc..)
              * Note only currently working with non-wrapping strips.
@@ -107,7 +107,7 @@ define(
              * Manually sets length of te Mask. Normally this is measured from the DOM, but if the first alignment happens before
              * the DOM is ready, then culling strips may not get populated. In this case, call this first with the size in pixels of
              * the mask.
-             * @param {Number} length The length in pixels to use in Mask calculations.
+             * @param length {number} The length in pixels to use in Mask calculations.
              */
             setMaskLength: function setMaskLength (length) {
                 this._mask.setLength(length);
@@ -115,8 +115,7 @@ define(
 
             /**
              * Removes a widget from the carousel
-             * @param {antie.widgets.Widget} widget Widget to remove from the DOM      
-             * @param {Boolean} [retainElement=false] Whether to keep the widget's output element in the DOM after removing widget  
+             * @param {antie.widgets.Widget} widget. Widget to remove from the DOM
              */
             remove: function remove (widget, retainElement) {
                 if (this.hasChildWidget(widget.id)) {

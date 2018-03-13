@@ -1,7 +1,7 @@
 /**
  * @fileOverview Requirejs module containing device modifier for HTML5 media playback
  * @preserve Copyright (c) 2013-present British Broadcasting Corporation. All rights reserved.
- * @license See https://github.com/bbc/tal/blob/master/LICENSE for full licence
+ * @license See https://github.com/fmtvp/tal/blob/master/LICENSE for full licence
  */
 
 define(
@@ -38,7 +38,6 @@ define(
             setSource: function setSource (mediaType, url, mimeType) {
                 if (this.getState() === MediaPlayer.STATE.EMPTY) {
                     this._trustZeroes = false;
-                    this._ignoreNextPauseEvent = false;
                     this._type = mediaType;
                     this._source = url;
                     this._mimeType = mimeType;
@@ -202,13 +201,13 @@ define(
                     this._sentinelLimits.pause.currentAttemptCount = 0;
                     if (this._isReadyToPlayFrom()) {
                         // If we are not ready to playFrom, then calling pause would seek to the start of media, which we might not want.
-                        this._pauseMediaElement();
+                        this._mediaElement.pause();
                     }
                     break;
 
                 case MediaPlayer.STATE.PLAYING:
                     this._sentinelLimits.pause.currentAttemptCount = 0;
-                    this._pauseMediaElement();
+                    this._mediaElement.pause();
                     this._toPaused();
                     break;
 
@@ -257,7 +256,7 @@ define(
                 case MediaPlayer.STATE.PLAYING:
                 case MediaPlayer.STATE.PAUSED:
                 case MediaPlayer.STATE.COMPLETE:
-                    this._pauseMediaElement();
+                    this._mediaElement.pause();
                     this._toStopped();
                     break;
 
@@ -380,17 +379,7 @@ define(
                 this._exitBuffering();
             },
 
-            _pauseMediaElement: function _pauseMediaElement () {
-                this._mediaElement.pause();
-                this._ignoreNextPauseEvent = true;
-            },
-
             _onPause: function _onPause () {
-                if (this._ignoreNextPauseEvent) {
-                    this._ignoreNextPauseEvent = false;
-                    return;
-                }
-
                 if (this.getState() !== MediaPlayer.STATE.PAUSED) {
                     this._toPaused();
                 }
@@ -462,7 +451,7 @@ define(
                 this._seekTo(this._targetSeekTime);
                 this._mediaElement.play();
                 if (this._postBufferingState === MediaPlayer.STATE.PAUSED) {
-                    this._pauseMediaElement();
+                    this._mediaElement.pause();
                 }
                 this._targetSeekTime = undefined;
             },
@@ -678,9 +667,9 @@ define(
             _shouldBePausedSentinel: function _shouldBePausedSentinel () {
                 var sentinelActionTaken = false;
                 if (this._hasSentinelTimeChangedWithinTolerance) {
-                    var self = this;
+                    var mediaElement = this._mediaElement;
                     sentinelActionTaken = this._nextSentinelAttempt(this._sentinelLimits.pause, function() {
-                        self._pauseMediaElement();
+                        mediaElement.pause();
                     });
                 }
 
