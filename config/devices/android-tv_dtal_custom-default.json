@@ -110,6 +110,14 @@
       "classes": [
         "browserdevice720p"
       ]
+    },
+    {
+      "width": 1920,
+      "height": 1080,
+      "module": "%application%/appui/layouts/1080p",
+      "classes": [
+        "browserdevice1080p"
+      ]
     }
   ],
   "networking": {
