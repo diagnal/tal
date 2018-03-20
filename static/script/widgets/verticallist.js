@@ -23,6 +23,8 @@ define(
          * @param {antie.Formatter} [itemFormatter] A formatter class used on each data item to generate the list item child widgets.
          * @param {antie.DataSource|Array} [dataSource] An array of data to be used to generate the list items, or an asynchronous data source.
          */
+        var interval;
+        var timeout;
         return List.extend(/** @lends antie.widgets.VerticalList.prototype */ {
             /**
              * @constructor
@@ -34,7 +36,10 @@ define(
 
                 var self = this;
                 this.addEventListener('keydown', function(e) {
-                    self._onKeyDown(e);
+                    self._onKeyDown(e,true,self);
+                });
+                this.addEventListener('keyup', function(e) {
+                    self._onKeyUp(e);
                 });
             },
             /**
@@ -43,12 +48,12 @@ define(
              * spatial navigation out of the list.
              * @param {antie.events.KeyEvent} evt The key event.
              */
-            _onKeyDown: function _onKeyDown (evt) {
+            _onKeyDown: function _onKeyDown (evt,isNormalPress,self) {
                 if(evt.keyCode !== KeyEvent.VK_UP && evt.keyCode !== KeyEvent.VK_DOWN) {
                     return;
                 }
 
-                var _newSelectedIndex = this._selectedIndex;
+                var _newSelectedIndex = self._selectedIndex;
                 var _newSelectedWidget = null;
                 do {
                     if(evt.keyCode === KeyEvent.VK_UP) {
@@ -56,10 +61,10 @@ define(
                     } else if(evt.keyCode === KeyEvent.VK_DOWN) {
                         _newSelectedIndex++;
                     }
-                    if(_newSelectedIndex < 0 || _newSelectedIndex >= this._childWidgetOrder.length) {
+                    if(_newSelectedIndex < 0 || _newSelectedIndex >= self._childWidgetOrder.length) {
                         break;
                     }
-                    var _widget = this._childWidgetOrder[_newSelectedIndex];
+                    var _widget = self._childWidgetOrder[_newSelectedIndex];
                     if(_widget.isFocusable()) {
                         _newSelectedWidget = _widget;
                         break;
@@ -67,10 +72,28 @@ define(
                 } while(true);
 
                 if(_newSelectedWidget) {
-                    this.setActiveChildWidget(_newSelectedWidget);
+                    self.setActiveChildWidget(_newSelectedWidget);
                     evt.stopPropagation();
-
+                }else{
+                    clearTimeout(timeout);
+                    clearInterval(interval);
                 }
+                if(isNormalPress){
+                    timeout=setTimeout(function() {
+                        interval=setInterval(function(){
+                    _onKeyDown(evt,false,self)
+                        },100)
+                    }, 400);
+                                        }
+            },
+            _onKeyUp: function _onKeyUp (evt) {
+                if(evt.keyCode !== KeyEvent.VK_UP && evt.keyCode !== KeyEvent.VK_DOWN) {
+                    return;
+                }
+
+            clearTimeout(timeout);
+            clearInterval(interval);
+            
             }
         });
     }

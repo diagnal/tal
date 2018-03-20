@@ -27,6 +27,9 @@ define(
          * @param {boolean} horizontalWrapping Enable or disable horizontal wrapping.
          * @param {boolean} verticalWrapping Enable or disable vertical wrapping.
          */
+
+        var interval;
+        var timeout;
         var Grid = Container.extend(/** @lends antie.widgets.Grid.prototype */ {
             /**
              * @constructor
@@ -51,7 +54,10 @@ define(
 
                 var self = this;
                 this.addEventListener('keydown', function (e) {
-                    self._onKeyDown(e);
+                    self._onKeyDown(e,true,self);
+                });
+                this.addEventListener('keyup', function(e) {
+                    self._onKeyUp(e);
                 });
             },
             /**
@@ -191,14 +197,14 @@ define(
              * spatial navigation out of the list.
              * @param {antie.events.KeyEvent} evt The key event.
              */
-            _onKeyDown: function _onKeyDown (evt) {
+            _onKeyDown: function _onKeyDown (evt,isNormalPress,self) {
                 if (evt.keyCode !== KeyEvent.VK_UP && evt.keyCode !== KeyEvent.VK_DOWN &&
                     evt.keyCode !== KeyEvent.VK_LEFT && evt.keyCode !== KeyEvent.VK_RIGHT) {
                     return;
                 }
 
-                var _newSelectedCol = this._selectedCol;
-                var _newSelectedRow = this._selectedRow;
+                var _newSelectedCol = self._selectedCol;
+                var _newSelectedRow = self._selectedRow;
                 var _newSelectedWidget = null;
                 do {
                     if (evt.keyCode === KeyEvent.VK_UP) {
@@ -212,15 +218,15 @@ define(
                     }
 
                     if (_newSelectedCol < 0) {
-                        if(this._horizontalWrapping) {
-                            _newSelectedCol = this._cols - 1;
+                        if(self._horizontalWrapping) {
+                            _newSelectedCol = self._cols - 1;
                         } else {
                             break;
                         }
                     }
 
-                    if(_newSelectedCol >= this._cols) {
-                        if(this._horizontalWrapping) {
+                    if(_newSelectedCol >= self._cols) {
+                        if(self._horizontalWrapping) {
                             _newSelectedCol = 0;
                         } else {
                             break;
@@ -228,23 +234,23 @@ define(
                     }
 
                     if (_newSelectedRow < 0) {
-                        if(this._verticalWrapping) {
-                            _newSelectedRow = this._rows - 1;
+                        if(self._verticalWrapping) {
+                            _newSelectedRow = self._rows - 1;
                         } else {
                             break;
                         }
                     }
 
-                    if(_newSelectedRow >= this._rows) {
-                        if(this._verticalWrapping) {
+                    if(_newSelectedRow >= self._rows) {
+                        if(self._verticalWrapping) {
                             _newSelectedRow = 0;
                         } else {
                             break;
                         }
                     }
 
-                    var _newSelectedIndex = (_newSelectedRow * this._cols) + _newSelectedCol;
-                    var _widget = this._childWidgetOrder[_newSelectedIndex];
+                    var _newSelectedIndex = (_newSelectedRow * self._cols) + _newSelectedCol;
+                    var _widget = self._childWidgetOrder[_newSelectedIndex];
                     if (_widget && _widget.isFocusable()) {
                         _newSelectedWidget = _widget;
                         break;
@@ -252,12 +258,30 @@ define(
                 } while (true);
 
                 if (_newSelectedWidget) {
-                    this.setActiveChildWidget(_newSelectedWidget);
+                    self.setActiveChildWidget(_newSelectedWidget);
                     evt.stopPropagation();
-
+                    
+                }else{
+                    clearTimeout(timeout);
+                    clearInterval(interval);
                 }
+                if(isNormalPress){
+                    timeout=setTimeout(function() {
+                        interval=setInterval(function(){
+                    _onKeyDown(evt,false,self)
+                        },100)
+                    }, 400);
+                                        }
+            
             },
-
+            _onKeyUp: function _onKeyUp (evt) {
+                if (evt.keyCode !== KeyEvent.VK_UP && evt.keyCode !== KeyEvent.VK_DOWN &&
+                    evt.keyCode !== KeyEvent.VK_LEFT && evt.keyCode !== KeyEvent.VK_RIGHT) {
+                    return;
+                }
+                clearTimeout(timeout);
+                clearInterval(interval);
+            },
             /**
              * Broadcasts an event from the application level to every single
              * object it contains.

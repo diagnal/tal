@@ -10,6 +10,7 @@ define(
         'antie/widgets/list',
         'antie/events/keyevent'
     ],
+    
     function(List, KeyEvent) {
         'use strict';
 
@@ -23,6 +24,9 @@ define(
          * @param {antie.Formatter} [itemFormatter] A formatter class used on each data item to generate the list item child widgets.
          * @param {antie.DataSource|Array} [dataSource] An array of data to be used to generate the list items, or an aysnchronous data source.
          */
+        var interval;
+        var timeout;
+        
         var HorizontalList = List.extend(/** @lends antie.widgets.HorizontalList.prototype */ {
             /**
              * @constructor
@@ -37,7 +41,10 @@ define(
 
                 var self = this;
                 this.addEventListener('keydown', function(e) {
-                    self._onKeyDown(e);
+                    self._onKeyDown(e,true,self);
+                });
+                this.addEventListener('keyup', function(e) {
+                    self._onKeyUp(e);
                 });
             },
 
@@ -49,19 +56,18 @@ define(
             setWrapMode: function setWrapMode (wrapMode) {
                 this._wrapMode = wrapMode;
             },
-
             /**
              * Key handler for horizontal lists. Processes KeyEvent.VK_LEFT and KeyEvent.VK_RIGHT keys and stops propagation
              * if the keypress is handled. Otherwise allows the event to be bubbled up to the parent widget to allow
              * spatial navigation out of the list.
              * @param {antie.events.KeyEvent} evt The key event.
              */
-            _onKeyDown: function _onKeyDown (evt) {
+            _onKeyDown: function _onKeyDown (evt,isNormalPress,self) {
                 if(evt.keyCode !== KeyEvent.VK_LEFT && evt.keyCode !== KeyEvent.VK_RIGHT) {
                     return;
                 }
 
-                var _newSelectedIndex = this._selectedIndex;
+                var _newSelectedIndex = self._selectedIndex;
                 var _newSelectedWidget = null;
                 do {
                     if(evt.keyCode === KeyEvent.VK_LEFT) {
@@ -71,13 +77,13 @@ define(
                     }
 
                     //force the index to wrap correctly
-                    if(this._wrapMode === HorizontalList.WRAP_MODE_WRAP ) {
-                        _newSelectedIndex = ( _newSelectedIndex + this._childWidgetOrder.length ) % this._childWidgetOrder.length;
-                    } else if(_newSelectedIndex < 0 || _newSelectedIndex >= this._childWidgetOrder.length) {
+                    if(self._wrapMode === HorizontalList.WRAP_MODE_WRAP ) {
+                        _newSelectedIndex = ( _newSelectedIndex + self._childWidgetOrder.length ) % self._childWidgetOrder.length;
+                    } else if(_newSelectedIndex < 0 || _newSelectedIndex >= self._childWidgetOrder.length) {
 
                         break;
                     }
-                    var _widget = this._childWidgetOrder[_newSelectedIndex];
+                    var _widget = self._childWidgetOrder[_newSelectedIndex];
                     if(_widget.isFocusable()) {
                         _newSelectedWidget = _widget;
                         break;
@@ -85,11 +91,29 @@ define(
                 } while(true);
 
                 if(_newSelectedWidget) {
-                    this.setActiveChildWidget(_newSelectedWidget);
+                    self.setActiveChildWidget(_newSelectedWidget);
                     evt.stopPropagation();
+                }else{
+                    clearTimeout(timeout);
+                    clearInterval(interval);
                 }
-
+                if(isNormalPress){
+                    timeout=setTimeout(function() {
+                        interval=setInterval(function(){
+                    _onKeyDown(evt,false,self)
+                        },100)
+                    }, 400);
+                                        }
+            
                 return (_newSelectedWidget !== null);
+            },
+
+            _onKeyUp: function _onKeyUp (evt) {
+                if(evt.keyCode !== KeyEvent.VK_LEFT && evt.keyCode !== KeyEvent.VK_RIGHT) {
+                    return;
+                }
+                clearTimeout(timeout);
+                clearInterval(interval);
             }
         });
 
