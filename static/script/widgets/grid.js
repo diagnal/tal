@@ -267,6 +267,7 @@ define(
                 }
                 if(isNormalPress){
                     timeout=setTimeout(function() {
+                        clearInterval(interval);
                         interval=setInterval(function(){
                     _onKeyDown(evt,false,self)
                         },100)
