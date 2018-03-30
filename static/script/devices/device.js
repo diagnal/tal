@@ -862,17 +862,23 @@ define("antie/devices/device", [
        */
       executeCrossDomainPost: function executeCrossDomainPost(url, data, opts) {
         var payload, modifiedOpts, formData;
+        var headers = opts.headers;
         payload = this.encodeJson(data);
         if (configSupportsCORS(this.getConfig())) {
           modifiedOpts = {
             onLoad: opts.onLoad,
             onError: opts.onError,
             headers: {
-              "Content-Type": "application/json"
+              "Content-Type": headers["Content-Type"] || "application/json"
             },
-            data: payload,
             method: "POST"
           };
+
+          if (headers["Content-Type"] === "application/x-www-form-urlencoded") {
+            modifiedOpts.data = data;
+          } else {
+            modifiedOpts.data = payload;
+          }
 
           if (opts.bearerToken) {
             modifiedOpts.headers.Authorization = "Bearer " + opts.bearerToken;
