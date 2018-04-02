@@ -862,7 +862,7 @@ define("antie/devices/device", [
        */
       executeCrossDomainPost: function executeCrossDomainPost(url, data, opts) {
         var payload, modifiedOpts, formData;
-        var headers = opts.headers;
+        var headers = opts.headers || {};
         payload = this.encodeJson(data);
         if (configSupportsCORS(this.getConfig())) {
           modifiedOpts = {
