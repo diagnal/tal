@@ -69,7 +69,8 @@
       "214": "LEFT",
       "215": "SUBTITLE",
       "217": "FAST_FWD",
-      "218": "REWIND"
+      "218": "REWIND",
+      "207": "INFO"
     }
   },
   "accessibility": {
