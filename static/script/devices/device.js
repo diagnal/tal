@@ -820,7 +820,9 @@ define("antie/devices/device", [
 
           if (opts.bearerToken) {
             modifiedOpts.headers = {
-              Authorization: "Bearer " + opts.bearerToken
+              Authorization: "Bearer " + opts.bearerToken,
+              "Content-Type": "application/json",
+              Accept: "application/json"
             };
           }
 
