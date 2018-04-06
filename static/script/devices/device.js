@@ -650,8 +650,10 @@ define("antie/devices/device", [
        */
       loadURL: function loadURL(url, opts) {
         var xhr = this._newXMLHttpRequest();
+        var abortTimeout = undefined;
         xhr.onreadystatechange = function() {
           if (xhr.readyState === 4) {
+            clearTimeout(abortTimeout);
             xhr.onreadystatechange = null;
             if (xhr.status >= 200 && xhr.status < 300) {
               if (opts.onLoad) {
@@ -671,6 +673,11 @@ define("antie/devices/device", [
 
         try {
           xhr.open(opts.method || "GET", url, true);
+          if (opts.abortAfter && (parseInt(opts.abortAfter, 10) || 0)) {
+            abortTimeout = setTimeout(function() {
+              xhr.abort();
+            }, parseInt(opts.abortAfter, 10));
+          }
           // TODO The opts protection in the following expression is redundant as there are lots of other places an undefined opts will cause TypeError to be thrown
           if (opts && opts.headers) {
             for (var header in opts.headers) {
@@ -815,7 +822,8 @@ define("antie/devices/device", [
               var json = jsonResponse ? self.decodeJson(jsonResponse) : {};
               opts.onSuccess(json);
             },
-            onError: opts.onError
+            onError: opts.onError,
+            abortAfter: opts.abortAfter
           };
 
           if (opts.bearerToken) {
