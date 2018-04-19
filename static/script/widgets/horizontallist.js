@@ -45,6 +45,10 @@ define("antie/widgets/horizontallist", [
                 });
             },
 
+            disableKeyLimitting: function disableKeyLimitting(disable) {
+                this.disableKeyLimit = disable;
+            },
+
             /**
              * Set whether to support wrapping within the list.
              * @param {Integer} wrapMode    Pass <code>HorizontalList.WRAP_MODE_NONE</code> for no wrapping.
@@ -67,7 +71,7 @@ define("antie/widgets/horizontallist", [
                 ) {
                     return;
                 }
-                if (!isNormalPress) {
+                if (!isNormalPress || this.disableKeyLimit == true) {
                     self.keyLimiterActive = false;
                 }
                 if (self.keyLimiterActive) {

@@ -40,6 +40,9 @@ define("antie/widgets/verticallist", [
                     self._onKeyUp(e);
                 });
             },
+            disableKeyLimitting: function disableKeyLimitting(disable) {
+                this.disableKeyLimit = disable;
+            },
             /**
              * Key handler for vertical lists. Processes KeyEvent.VK_UP and KeyEvent.VK_DOWN keys and stops propagation
              * if the keypress is handled. Otherwise allows the event to be bubbled up to the parent widget to allow
@@ -53,7 +56,7 @@ define("antie/widgets/verticallist", [
                 ) {
                     return;
                 }
-                if (!isNormalPress) {
+                if (!isNormalPress || this.disableKeyLimit == true) {
                     self.keyLimiterActive = false;
                 }
                 if (self.keyLimiterActive) {
