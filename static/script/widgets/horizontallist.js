@@ -4,48 +4,49 @@
  * @license See https://github.com/fmtvp/tal/blob/master/LICENSE for full licence
  */
 
-define(
-    'antie/widgets/horizontallist',
-    [
-        'antie/widgets/list',
-        'antie/events/keyevent'
-    ],
-    
-    function(List, KeyEvent) {
-        'use strict';
+define("antie/widgets/horizontallist", [
+    "antie/widgets/list",
+    "antie/events/keyevent"
+], function(List, KeyEvent) {
+    "use strict";
 
-        /**
-         * The HorizontalList widget is a container widget that supports spatial navigation between items using {@link KeyEvent.VK_LEFT} and {@link KeyEvent.VK_RIGHT}.
-         * @name antie.widgets.HorizontalList
-         * @class
-         * @extends antie.widgets.List
-         * @requires antie.events.KeyEvent
-         * @param {String} [id] The unique ID of the widget. If excluded, a temporary internal ID will be used (but not included in any output).
-         * @param {antie.Formatter} [itemFormatter] A formatter class used on each data item to generate the list item child widgets.
-         * @param {antie.DataSource|Array} [dataSource] An array of data to be used to generate the list items, or an aysnchronous data source.
-         */
-        var interval;
-        var timeout;
-        
-        var HorizontalList = List.extend(/** @lends antie.widgets.HorizontalList.prototype */ {
+    /**
+     * The HorizontalList widget is a container widget that supports spatial navigation between items using {@link KeyEvent.VK_LEFT} and {@link KeyEvent.VK_RIGHT}.
+     * @name antie.widgets.HorizontalList
+     * @class
+     * @extends antie.widgets.List
+     * @requires antie.events.KeyEvent
+     * @param {String} [id] The unique ID of the widget. If excluded, a temporary internal ID will be used (but not included in any output).
+     * @param {antie.Formatter} [itemFormatter] A formatter class used on each data item to generate the list item child widgets.
+     * @param {antie.DataSource|Array} [dataSource] An array of data to be used to generate the list items, or an aysnchronous data source.
+     */
+    var interval;
+    var timeout;
+
+    var HorizontalList = List.extend(
+        /** @lends antie.widgets.HorizontalList.prototype */ {
             /**
              * @constructor
              * @ignore
              */
-            init: function init (id, itemFormatter, dataSource) {
+            init: function init(id, itemFormatter, dataSource) {
                 // we need to wrap our contents in a mask to support animation
                 this._maskElement = null;
 
                 init.base.call(this, id, itemFormatter, dataSource);
-                this.addClass('horizontallist');
+                this.addClass("horizontallist");
 
                 var self = this;
-                this.addEventListener('keydown', function(e) {
-                    self._onKeyDown(e,true,self);
+                this.addEventListener("keydown", function(e) {
+                    self._onKeyDown(e, true, self);
                 });
-                this.addEventListener('keyup', function(e) {
+                this.addEventListener("keyup", function(e) {
                     self._onKeyUp(e);
                 });
+            },
+
+            disableKeyLimitting: function disableKeyLimitting(disable) {
+                this.disableKeyLimit = disable;
             },
 
             /**
@@ -53,7 +54,7 @@ define(
              * @param {Integer} wrapMode    Pass <code>HorizontalList.WRAP_MODE_NONE</code> for no wrapping.
              *                              Pass <code>HorizontalList.WRAP_MODE_NONE</code> to allow navigation to wrap.
              */
-            setWrapMode: function setWrapMode (wrapMode) {
+            setWrapMode: function setWrapMode(wrapMode) {
                 this._wrapMode = wrapMode;
             },
             /**
@@ -62,65 +63,88 @@ define(
              * spatial navigation out of the list.
              * @param {antie.events.KeyEvent} evt The key event.
              */
-            _onKeyDown: function _onKeyDown (evt,isNormalPress,self) {
-                if(evt.keyCode !== KeyEvent.VK_LEFT && evt.keyCode !== KeyEvent.VK_RIGHT) {
+            _onKeyDown: function _onKeyDown(evt, isNormalPress, self) {
+                console.error("isNormalPress", isNormalPress);
+                if (
+                    evt.keyCode !== KeyEvent.VK_LEFT &&
+                    evt.keyCode !== KeyEvent.VK_RIGHT
+                ) {
                     return;
                 }
+                if (!isNormalPress || this.disableKeyLimit == true) {
+                    self.keyLimiterActive = false;
+                }
+                if (self.keyLimiterActive) {
+                    evt.stopPropagation();
+                    return;
+                }
+                self.keyLimiterActive = true;
+                setTimeout(function() {
+                    self.keyLimiterActive = false;
+                }, 300);
 
                 var _newSelectedIndex = self._selectedIndex;
                 var _newSelectedWidget = null;
                 do {
-                    if(evt.keyCode === KeyEvent.VK_LEFT) {
+                    if (evt.keyCode === KeyEvent.VK_LEFT) {
                         _newSelectedIndex--;
-                    } else if(evt.keyCode === KeyEvent.VK_RIGHT) {
+                    } else if (evt.keyCode === KeyEvent.VK_RIGHT) {
                         _newSelectedIndex++;
                     }
 
                     //force the index to wrap correctly
-                    if(self._wrapMode === HorizontalList.WRAP_MODE_WRAP ) {
-                        _newSelectedIndex = ( _newSelectedIndex + self._childWidgetOrder.length ) % self._childWidgetOrder.length;
-                    } else if(_newSelectedIndex < 0 || _newSelectedIndex >= self._childWidgetOrder.length) {
-
+                    if (self._wrapMode === HorizontalList.WRAP_MODE_WRAP) {
+                        _newSelectedIndex =
+                            (_newSelectedIndex +
+                                self._childWidgetOrder.length) %
+                            self._childWidgetOrder.length;
+                    } else if (
+                        _newSelectedIndex < 0 ||
+                        _newSelectedIndex >= self._childWidgetOrder.length
+                    ) {
                         break;
                     }
                     var _widget = self._childWidgetOrder[_newSelectedIndex];
-                    if(_widget.isFocusable()) {
+                    if (_widget.isFocusable()) {
                         _newSelectedWidget = _widget;
                         break;
                     }
-                } while(true);
+                } while (true);
 
-                if(_newSelectedWidget) {
+                if (_newSelectedWidget) {
                     self.setActiveChildWidget(_newSelectedWidget);
                     evt.stopPropagation();
-                }else{
+                } else {
                     clearTimeout(timeout);
                     clearInterval(interval);
                 }
-                if(isNormalPress){
-                    timeout=setTimeout(function() {
+                if (isNormalPress) {
+                    timeout = setTimeout(function() {
                         clearInterval(interval);
-                        interval=setInterval(function(){
-                    _onKeyDown(evt,false,self)
-                        },100)
+                        interval = setInterval(function() {
+                            _onKeyDown(evt, false, self);
+                        }, 100);
                     }, 400);
-                                        }
-            
-                return (_newSelectedWidget !== null);
+                }
+
+                return _newSelectedWidget !== null;
             },
 
-            _onKeyUp: function _onKeyUp (evt) {
-                if(evt.keyCode !== KeyEvent.VK_LEFT && evt.keyCode !== KeyEvent.VK_RIGHT) {
+            _onKeyUp: function _onKeyUp(evt) {
+                if (
+                    evt.keyCode !== KeyEvent.VK_LEFT &&
+                    evt.keyCode !== KeyEvent.VK_RIGHT
+                ) {
                     return;
                 }
                 clearTimeout(timeout);
                 clearInterval(interval);
             }
-        });
+        }
+    );
 
-        HorizontalList.WRAP_MODE_NONE = 0;
-        HorizontalList.WRAP_MODE_WRAP = 1;
+    HorizontalList.WRAP_MODE_NONE = 0;
+    HorizontalList.WRAP_MODE_WRAP = 1;
 
-        return HorizontalList;
-    }
-);
+    return HorizontalList;
+});
