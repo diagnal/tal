@@ -177,7 +177,9 @@ define("antie/widgets/widget", [
                   exception,
                   listeners[func]
                 );
+                /* @if APP_DEVELOP=false */
                 throw exception;
+                /* @endif */
               }
             }
           }
