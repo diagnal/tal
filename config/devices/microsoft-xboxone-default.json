@@ -7,14 +7,14 @@
       "antie/devices/mediaplayer/html5untyped",
       "antie/devices/mediaplayer/live/restartable",
       "antie/devices/data/nativejson",
-      "antie/devices/logging/onscreen",
+      "antie/devices/logging/default",
       "antie/devices/logging/xhr",
       "antie/devices/logging/jstestdriver",
       "antie/devices/storage/xboxpls"
     ]
   },
   "logging": {
-    "level": "none"
+    "level": "warn"
   },
   "displayQuality": "high",
   "streaming": {

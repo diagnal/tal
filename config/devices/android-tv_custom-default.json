@@ -7,8 +7,8 @@
       "antie/devices/mediaplayer/html5",
       "antie/devices/mediaplayer/live/playable",
       "antie/devices/data/json2",
-	  "antie/devices/storage/cookie",
-      "antie/devices/logging/onscreen",
+      "antie/devices/storage/cookie",
+      "antie/devices/logging/default",
       "antie/devices/logging/xhr",
       "antie/devices/logging/jstestdriver",
       "antie/devices/exit/history",
@@ -16,23 +16,16 @@
     ]
   },
   "logging": {
-    "level": "none"
+    "level": "warn"
   },
   "streaming": {
     "video": {
       "mediaURIFormat": "%href%",
       "supported": [
         {
-          "protocols": [
-            "http"
-          ],
-          "encodings": [
-            "h264"
-          ],
-          "transferFormat": [
-            "hls",
-            "plain"
-          ],
+          "protocols": ["http"],
+          "encodings": ["h264"],
+          "transferFormat": ["hls", "plain"],
           "maximumBitRate": 3600,
           "maximumVideoLines": 1080
         }
@@ -42,12 +35,8 @@
       "mediaURIFormat": "%href%",
       "supported": [
         {
-          "protocols": [
-            "http"
-          ],
-          "encodings": [
-            "aac"
-          ]
+          "protocols": ["http"],
+          "encodings": ["aac"]
         }
       ]
     }
@@ -89,9 +78,7 @@
   },
   "accessibility": {
     "captions": {
-      "supported": [
-        "application/ttaf+xml"
-      ]
+      "supported": ["application/ttaf+xml"]
     }
   },
   "layouts": [
@@ -99,18 +86,14 @@
       "width": 1920,
       "height": 1080,
       "module": "%application%/appui/layouts/1080p",
-      "classes": [
-        "browserdevice1080p"
-      ]
+      "classes": ["browserdevice1080p"]
     }
   ],
   "networking": {
     "supportsJSONP": true,
     "supportsCORS": true
   },
-  "capabilities": [
-    "longVodAssetsUnsupported"
-  ],
+  "capabilities": ["longVodAssetsUnsupported"],
   "statLabels": {
     "deviceType": "smarttv",
     "serviceType": "retail",
