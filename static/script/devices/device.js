@@ -823,15 +823,16 @@ define("antie/devices/device", [
               opts.onSuccess(json);
             },
             onError: opts.onError,
-            abortAfter: opts.abortAfter
+            abortAfter: opts.abortAfter,
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json"
+            }
           };
 
           if (opts.bearerToken) {
-            modifiedOpts.headers = {
-              Authorization: "Bearer " + opts.bearerToken,
-              "Content-Type": "application/json",
-              Accept: "application/json"
-            };
+            modifiedOpts.headers["Authorization"] =
+              "Bearer " + opts.bearerToken;
           }
 
           this.loadURL(url, modifiedOpts);
