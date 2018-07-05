@@ -815,6 +815,9 @@ define("antie/devices/device", [
       ) {
         var self, callbackKey, callbackQuery, modifiedOpts;
         self = this;
+        var headers = opts.headers || {};
+        headers["Content-Type"] = headers["Content-Type"] || "application/json";
+        headers["Accept"] = "application/json";
         jsonpOptions = jsonpOptions || {};
         if (configSupportsCORS(this.getConfig())) {
           modifiedOpts = {
@@ -824,10 +827,7 @@ define("antie/devices/device", [
             },
             onError: opts.onError,
             abortAfter: opts.abortAfter,
-            headers: {
-              "Content-Type": "application/json",
-              Accept: "application/json"
-            }
+            headers: headers
           };
 
           if (opts.bearerToken) {
@@ -876,12 +876,11 @@ define("antie/devices/device", [
         var headers = opts.headers || {};
         payload = this.encodeJson(data);
         if (configSupportsCORS(this.getConfig())) {
+          headers["Content-Type"] = headers["Content-Type"] || "application/json";
           modifiedOpts = {
             onLoad: opts.onLoad,
             onError: opts.onError,
-            headers: {
-              "Content-Type": headers["Content-Type"] || "application/json"
-            },
+            headers: headers,
             method: "POST"
           };
 
