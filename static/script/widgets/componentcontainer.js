@@ -174,8 +174,12 @@ define('antie/widgets/componentcontainer',
              * Return this component container to the previous component in the history.
              */
             back: function back () {
-                var _focus = this._currentComponent.getIsModal() ? this._previousFocus : null;
-
+                var _focus;
+                try {
+                    _focus = this._currentComponent.getIsModal() ? this._previousFocus : null;
+                } catch (e){
+                    _focus = null;
+                }
                 var _lastComponent = this._historyStack.pop();
                 if (_lastComponent) {
                     this._previousFocus = _lastComponent.previousFocus;
@@ -192,8 +196,12 @@ define('antie/widgets/componentcontainer',
                 if (this._currentComponent) {
                     var evt = new ComponentEvent('beforehide', this, this._currentComponent, args, state, fromBack);
                     this._currentComponent.bubbleEvent(evt);
-
-                    var _state = keepHistory ? this._currentComponent.getCurrentState() : null;
+                    var _state;
+                    try {
+                        _state = keepHistory ? this._currentComponent.getCurrentState() : null;
+                    } catch(e) {
+                        _state = null;
+                    }
 
                     // remove the child widget, but if default event is prevented, keep the output element in the DOM
                     this.removeChildWidget(this._currentComponent, evt.isDefaultPrevented());
