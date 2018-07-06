@@ -657,10 +657,6 @@ define("antie/devices/device", [
             xhr.onreadystatechange = null;
             if (xhr.status >= 200 && xhr.status < 300) {
               if (opts.onLoad) {
-                var bearer = xhr.getResponseHeader("Authorization");
-                if (bearer) {
-                  window.Authorization = bearer.split("Bearer ")[1];
-                }
                 opts.onLoad(xhr.responseText, xhr.status);
               }
             } else {
