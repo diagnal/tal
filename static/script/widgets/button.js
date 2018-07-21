@@ -66,8 +66,29 @@ define(
                 for(var i=0; i<this._childWidgetOrder.length; i++) {
                     device.appendChildElement(this.outputElement, this._childWidgetOrder[i].render(device));
                 }
+				 this._attachMouseListeners();
                 return this.outputElement;
             },
+			
+			 /** Adds support to mouse hover and click events.
+			 Use window.disableMouseEvents to disable mouse events */
+            _attachMouseListeners: function _attachMouseListeners() {
+                if (this.outputElement && !window.disableMouseEvents) {
+                    var self = this;
+                    this.outputElement.addEventListener("mouseover", function(e) {
+                        if (self.isFocusable()) {
+                            self.focus();
+                        }
+                    });
+
+                    this.outputElement.addEventListener("click", function(e) {
+                        if (self.isFocusable()) {
+                            self.select();
+                        }
+                    });
+                }
+            },
+			
             /**
              * Checks to see if a widget is focusable.
              * @see antie.widgets.Button
