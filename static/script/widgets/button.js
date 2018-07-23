@@ -37,6 +37,8 @@ define("antie/widgets/button", [
 
                 this._focusDelayHandle = null;
                 this._disabled = false;
+                this.disableMouseFocus = false;
+                this.disableMouseClick = false;
 
                 /* Reduce the focusDelayTimeout for devices that don't have animation enabled */
                 if (
@@ -86,14 +88,22 @@ define("antie/widgets/button", [
                     this.outputElement.addEventListener("mouseover", function(
                         e
                     ) {
-                        if (self.isFocusable() && self.isVisible()) {
-                            self.focus();
+                        if (
+                            self.isFocusable() &&
+                            self.isVisible() &&
+                            !self.disableMouseFocus
+                        ) {
+                            self.focus(false, true);
                         }
                     });
 
                     this.outputElement.addEventListener("click", function(e) {
-                        if (self.isFocusable() && self.isVisible()) {
-                            self.select();
+                        if (
+                            self.isFocusable() &&
+                            self.isVisible() &&
+                            !self.disableMouseClick
+                        ) {
+                            self.select(true);
                         }
                     });
                 }
@@ -134,7 +144,7 @@ define("antie/widgets/button", [
              * @param {Boolean} [force] Pass <code>true</code> to force focus to a disabled button.
              * @returns Boolean true if focus has been moved to the button. Otherwise returns false.
              */
-            focus: function focus(force) {
+            focus: function focus(force, isMouseEvent) {
                 var origDisabled = this._disabled;
                 if (force) {
                     this._disabled = false;
@@ -142,6 +152,7 @@ define("antie/widgets/button", [
 
                 var focusChanged = true;
                 var w = this;
+                w.isMouseEvent = isMouseEvent == true;
                 while (w.parentWidget) {
                     if (!w.parentWidget.setActiveChildWidget(w)) {
                         focusChanged = false;
@@ -153,8 +164,10 @@ define("antie/widgets/button", [
 
                 return focusChanged;
             },
-            select: function select() {
-                this.bubbleEvent(new SelectEvent(this));
+            select: function select(isMouseEvent) {
+                var selectEvt = new SelectEvent(this);
+                selectEvt.isMouseEvent = isMouseEvent == true;
+                this.bubbleEvent(selectEvt);
             },
             /**
              * Flags the active child as focussed or blurred.
