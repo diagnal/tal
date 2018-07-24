@@ -11,7 +11,8 @@ define("antie/widgets/button", [
     "antie/events/selectevent"
 ], function(Container, FocusDelayEvent, KeyEvent, SelectEvent) {
     "use strict";
-
+    window.lastMouseX = -100;
+    window.lastMouseY = -100;
     /**
      * The Button widget class represents a container widget which can receive focus and be selected/activated by the user.
      * @name antie.widgets.Button
@@ -93,6 +94,14 @@ define("antie/widgets/button", [
                             self.isVisible() &&
                             !self.disableMouseFocus
                         ) {
+                            if (
+                                lastMouseX == e.screenX &&
+                                lastMouseY == e.screenY
+                            ) {
+                                return;
+                            }
+                            lastMouseX = e.screenX;
+                            lastMouseY = e.screenY;
                             self.focus(false, true);
                         }
                     });
