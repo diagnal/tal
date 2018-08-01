@@ -64,7 +64,6 @@ define("antie/widgets/horizontallist", [
              * @param {antie.events.KeyEvent} evt The key event.
              */
             _onKeyDown: function _onKeyDown(evt, isNormalPress, self) {
-                console.error("isNormalPress", isNormalPress);
                 if (
                     evt.keyCode !== KeyEvent.VK_LEFT &&
                     evt.keyCode !== KeyEvent.VK_RIGHT

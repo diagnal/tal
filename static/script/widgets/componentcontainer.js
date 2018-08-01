@@ -8,9 +8,10 @@
 define('antie/widgets/componentcontainer',
     [
         'antie/widgets/container',
-        'antie/events/componentevent'
+        'antie/events/componentevent',
+		'antie/events/keyevent'
     ],
-    function (Container, ComponentEvent) {
+    function (Container, ComponentEvent, KeyEvent) {
         'use strict';
 
         var _knownComponents = {};
@@ -37,6 +38,7 @@ define('antie/widgets/componentcontainer',
                 this._previousFocus = null;
                 init.base.call(this, id);
                 this.addClass('componentcontainer');
+				this._addMouseScrollListener();
             },
             /**
              * Callback called when a requirejs containing a component has been loaded.
@@ -156,6 +158,39 @@ define('antie/widgets/componentcontainer',
                     });
                 }
             },
+			
+			_addMouseScrollListener: function _addMouseScrollListener(){
+				  window.addEventListener("wheel", this._onMouseWheelEvent);
+			},
+			
+			_onMouseWheelEvent : function _onMouseWheelEvent(event){
+				 if(window.disableMouseEvents) {
+					 return;
+				 }
+				 var code = null;
+				 var name = null;
+				  if(event.deltaY > 0){
+						code = KeyEvent.VK_DOWN;
+						name = "down"
+				  } else if(event.deltaY < 0){
+						code = KeyEvent.VK_UP;
+						name = "up"
+				  }
+				  if(code && name) {
+					raiseEvent("keydown", name, code);
+					setTimeout(function() { raiseEvent("keyup", name, code); }, 200);
+				  }
+				  
+			},
+			raiseEvent: function raiseEvent(name, key, keyCode) {
+			  var event = document.createEvent('Event');
+			  event.initEvent(name, true, true);
+			  event.key = key;
+			  event.keyCode = keyCode;
+			  document.body.dispatchEvent(event);
+			},
+			
+			
             /**
              * Pushes a component into the history stack of the container (and shows it).
              * @param {String} module The requirejs module name of the component to show.
