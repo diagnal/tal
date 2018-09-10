@@ -4,18 +4,24 @@
  * @license See https://github.com/fmtvp/tal/blob/master/LICENSE for full licence
  */
 
-define(
-    'antie/devices/data/nativejson',
-    ['antie/devices/browserdevice'],
-    function(Device) {
-        'use strict';
+define("antie/devices/data/nativejson", [
+  "antie/devices/browserdevice"
+], function(Device) {
+  "use strict";
 
-        /* Patch Device.prototype.encodeJson and Device.prototype.decodeJson */
-        Device.prototype.decodeJson = function(json) {
-            return JSON.parse(json);
-        };
-        Device.prototype.encodeJson = function(obj) {
-            return JSON.stringify(obj);
-        };
+  /* Patch Device.prototype.encodeJson and Device.prototype.decodeJson */
+  Device.prototype.decodeJson = function(json) {
+    try {
+      return JSON.parse(json);
+    } catch (e) {
+      return json;
     }
-);
+  };
+  Device.prototype.encodeJson = function(obj) {
+    try {
+      return JSON.stringify(obj);
+    } catch (e) {
+      return obj;
+    }
+  };
+});
