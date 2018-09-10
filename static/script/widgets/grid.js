@@ -44,7 +44,9 @@ define(
 
                 this._horizontalWrapping =  !!horizontalWrapping;
                 this._verticalWrapping = !!verticalWrapping;
+				this._continousWrapping = true;
 
+				
                 this._selectedRow = 0;
                 this._selectedCol = 0;
 
@@ -220,6 +222,9 @@ define(
                     if (_newSelectedCol < 0) {
                         if(self._horizontalWrapping) {
                             _newSelectedCol = self._cols - 1;
+                        } else if(self._continousWrapping) {
+							_newSelectedCol = self._cols - 1;
+							_newSelectedRow--;
                         } else {
                             break;
                         }
@@ -228,6 +233,9 @@ define(
                     if(_newSelectedCol >= self._cols) {
                         if(self._horizontalWrapping) {
                             _newSelectedCol = 0;
+                        } else if(self._continousWrapping) {
+							_newSelectedCol = 0;
+							_newSelectedRow++;
                         } else {
                             break;
                         }
