@@ -60,6 +60,7 @@ define("antie/widgets/carousel/keyhandlers/keyhandler", [
                 var intervalHandle = undefined;
                 var keyblockerActive = false;
                 carousel.addEventListener("keydown", function(ev) {
+                    self.keyUpPressed = false;
                     if (keyblockerActive) {
                         ev.stopPropagation();
                         return;
@@ -113,9 +114,18 @@ define("antie/widgets/carousel/keyhandlers/keyhandler", [
                 }
 
                 function checklongPress(event) {
+                    if (self.keyUpPressed) {
+                        return;
+                    }
                     timeOutHandle = setTimeout(function() {
                         clearInterval(intervalHandle);
+                        if (self.keyUpPressed) {
+                            return;
+                        }
                         intervalHandle = setInterval(function() {
+                            if (self.keyUpPressed) {
+                                return;
+                            }
                             if (event.keyCode == self.PREVIOUS) {
                                 self._animationOptions.duration = 200;
                                 self._animationOptions.easing = "linear";
@@ -131,10 +141,14 @@ define("antie/widgets/carousel/keyhandlers/keyhandler", [
                     }, 400);
                 }
 
-                carousel.addEventListener("keyup", function(ev) {
-                    clearInterval(intervalHandle);
-                    clearTimeout(timeOutHandle);
-                });
+                carousel.addEventListener(
+                    "keyup",
+                    function(ev) {
+                        this.keyUpPressed = true;
+                        clearInterval(intervalHandle);
+                        clearTimeout(timeOutHandle);
+                    }.bind(this)
+                );
             },
 
             _addAlignmentListeners: function _addAlignmentListeners() {}
