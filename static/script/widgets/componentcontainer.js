@@ -251,6 +251,16 @@ define("antie/widgets/componentcontainer", [
       },
 
       _triggerMouseDpadNavigationEvent: function _triggerMouseDpadNavigationEvent(){
+        /*
+         the mouseDpadNavigationEnabled flag can be set from the core project with other api
+         Like in case of LG webOS we use the document "cursorStateChange" listener to determine
+         whether the cursor is visible or not.
+         */
+        if (!window.mouseDpadNavigationEnabled) {
+          window.mouseNavigationKeyCode = null;
+          window.mouseNavigationKeyName = null;
+          return; 
+        }
         if (window.mouseNavigationKeyCode && window.mouseNavigationKeyName) {
           raiseEvent("keydown", window.mouseNavigationKeyName, window.mouseNavigationKeyCode);
           setTimeout(function() {
