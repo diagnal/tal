@@ -37,6 +37,7 @@ define("antie/widgets/componentcontainer", [
         init.base.call(this, id);
         this.addClass("componentcontainer");
         this._addMouseScrollListener();
+        this._addMouseMoveListener();
       },
       /**
        * Callback called when a requirejs containing a component has been loaded.
@@ -209,6 +210,84 @@ define("antie/widgets/componentcontainer", [
             }
           });
         }
+      },
+
+      _addMouseMoveListener: function _addMouseMoveListener() {
+        var self = this;
+        window.addEventListener("mousemove", this._onMouseMoveEvent.bind(self));
+      },
+
+      /*
+        Mouse DPAD Navigation Logic:
+        check if the mouse pointer is at extream left/top/right/bottom position
+        if so then set a trigger to check if the user moves out 
+        if the user does not moves out then initiate the dpad events at regular interval until the mouse pointer is moved out of the extreams
+      */
+      _onMouseMoveEvent: function _onMouseMoveEvent(evt){
+        // console.log("mouseEvent "+mouseEvent.clientX+" , "+mouseEvent.clientY+"  = "+ window.screen.width + " / " + window.screen.height);
+        if (window.disableMouseEvents) {
+          this._clearMouseNavigationTriggers();
+          return;
+        }
+        if(evt.clientX < 20) { // extream left
+          window.mouseNavigationKeyCode = KeyEvent.VK_LEFT;
+          window.mouseNavigationKeyName = "left";
+          this._checkIfUserWantsNavigation();
+        } else if (evt.clientX > window.screen.width - 20){ // extream right
+          window.mouseNavigationKeyCode = KeyEvent.VK_RIGHT;
+          window.mouseNavigationKeyName = "right";
+          this._checkIfUserWantsNavigation();
+        } else if (evt.clientY < 20){ // extream top
+          window.mouseNavigationKeyCode = KeyEvent.VK_UP;
+          window.mouseNavigationKeyName = "up";
+          this._checkIfUserWantsNavigation();
+        } else if (evt.clientY > window.screen.height - 20){ // extream bottom
+          window.mouseNavigationKeyCode = KeyEvent.VK_DOWN;
+          window.mouseNavigationKeyName = "down";
+          this._checkIfUserWantsNavigation();
+        } else {
+          this._clearMouseNavigationTriggers();
+        }
+      },
+
+      _triggerMouseDpadNavigationEvent: function _triggerMouseDpadNavigationEvent(){
+        if (window.mouseNavigationKeyCode && window.mouseNavigationKeyName) {
+          raiseEvent("keydown", window.mouseNavigationKeyName, window.mouseNavigationKeyCode);
+          setTimeout(function() {
+            raiseEvent("keyup", window.mouseNavigationKeyName, window.mouseNavigationKeyCode);
+          }, 200);
+        }
+      },
+
+      _checkIfUserWantsNavigation: function _checkIfUserWantsNavigation(){
+          if(window.mouseDpadNavigationEnabled) return;
+          window.mouseDpadNavigationEnabled = true;
+          var self = this;
+          window.mouseNavigationTriggerTimeout = setTimeout(this._userWantsMouseNavigation.bind(self), 500);
+      },
+
+      _userWantsMouseNavigation: function _userWantsMouseNavigation(){
+        var self = this;
+        window.mouseNavigationTriggerInterval = setInterval(this._triggerMouseDpadNavigationEvent.bind(self), 500);
+      },
+
+      _clearMouseNavigationTriggers: function _clearMouseNavigationTriggers(){
+        if(!window.mouseDpadNavigationEnabled) return;
+        console.log("_clearMouseNavigationTriggers");
+        if(window.mouseNavigationTriggerTimeout){
+          clearTimeout(window.mouseNavigationTriggerTimeout);
+          window.mouseNavigationTriggerTimeout = null;
+        }
+        if(window.mouseNavigationTriggerInterval){
+          clearInterval(window.mouseNavigationTriggerInterval);
+          window.mouseNavigationTriggerInterval = null;
+        }
+        if(window.mouseNavigationKeyCode && window.mouseNavigationKeyName){
+          raiseEvent("keyup", window.mouseNavigationKeyName, window.mouseNavigationKeyCode);
+        }
+        window.mouseNavigationKeyCode = null;
+        window.mouseNavigationKeyName = null;
+        window.mouseDpadNavigationEnabled = false;
       },
 
       _addMouseScrollListener: function _addMouseScrollListener() {
