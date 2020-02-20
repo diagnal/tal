@@ -283,7 +283,6 @@ define("antie/widgets/componentcontainer", [
 
       _clearMouseNavigationTriggers: function _clearMouseNavigationTriggers(){
         if(!window.mouseDpadNavigationEnabled) return;
-        console.log("_clearMouseNavigationTriggers");
         if(window.mouseNavigationTriggerTimeout){
           clearTimeout(window.mouseNavigationTriggerTimeout);
           window.mouseNavigationTriggerTimeout = null;
