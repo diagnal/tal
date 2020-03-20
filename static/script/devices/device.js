@@ -858,7 +858,9 @@ define("antie/devices/device", [
 
                     if (opts.bearerToken) {
                         modifiedOpts.headers["Authorization"] =
-                            "Bearer " + opts.bearerToken;
+                        // "Bearer " + opts.bearerToken;
+                        // For new implementstion bearer is removed
+                           opts.bearerToken;
                     }
 
                     this.loadURL(url, modifiedOpts);
@@ -987,7 +989,9 @@ define("antie/devices/device", [
 
                     if (opts.bearerToken) {
                         modifiedOpts.headers.Authorization =
-                            "Bearer " + opts.bearerToken;
+                        // "Bearer " + opts.bearerToken;
+                        // For new implementstion bearer is removed
+                        opts.bearerToken;
                     }
 
                     this.loadURL(url, modifiedOpts);
@@ -1038,7 +1042,9 @@ define("antie/devices/device", [
 
                 if (opts.bearerToken) {
                     modifiedOpts.headers.Authorization =
-                        "Bearer " + opts.bearerToken;
+                    // "Bearer " + opts.bearerToken;
+                        // For new implementstion bearer is removed
+                        opts.bearerToken;
                 }
 
                 this.loadURL(url, modifiedOpts);
