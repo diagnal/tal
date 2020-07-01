@@ -315,6 +315,7 @@ define(
 
                 document.onkeydown = function(e) {
                     e = e || window.event;
+                    if(!e.keyCode) return; // DTA-1099 [LG][ANDROID][Bugsnag] Cannot read property 'toString' of null
                     var _keyCode = _keyMap[e.keyCode.toString()];
                     if (_keyCode) {
                         if (!_pressed[e.keyCode.toString()]) {
@@ -328,6 +329,7 @@ define(
                 };
                 document.onkeyup = function(e) {
                     e = e || window.event;
+                    if(!e.keyCode) return; // DTA-1099 [LG][ANDROID][Bugsnag] Cannot read property 'toString' of null
                     var _keyCode = _keyMap[e.keyCode.toString()];
                     if (_keyCode) {
                         delete _pressed[e.keyCode.toString()];
@@ -337,6 +339,7 @@ define(
                 };
                 document.onkeypress = function(e) {
                     e = e || window.event;
+                    if(!e.keyCode) return; // DTA-1099 [LG][ANDROID][Bugsnag] Cannot read property 'toString' of null
                     var _keyCode = _keyMap[e.keyCode.toString()];
                     if (_keyCode) {
                         self._application.bubbleEvent(new KeyEvent('keypress', _keyCode));
