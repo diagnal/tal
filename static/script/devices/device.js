@@ -658,6 +658,20 @@ define("antie/devices/device", [
                 return new XMLHttpRequest();
             },
 
+            _getResponseHeadersFromXHR: function(xhr){
+                var headers = xhr.getAllResponseHeaders();
+                if(headers){
+                    headers = headers.split(/\n|\r|\r\n/g).reduce(function(a, b) {
+                        if (b.length) {
+                            var [ key, value ] = b.split(': ');
+                            a[key] = value;
+                        }
+                        return a;
+                    }, {});
+                }
+                return headers;
+            },
+
             /**
              * Loads a resource from a URL.
              * @param {String} url The URL to load.
@@ -665,6 +679,7 @@ define("antie/devices/device", [
              * @returns {XMLHttpRequest} The request object used to load the resource.
              */
             loadURL: function loadURL(url, opts) {
+                var self = this;
                 var xhr = this._newXMLHttpRequest();
                 var abortTimeout = undefined;
                 xhr.onreadystatechange = function() {
@@ -673,11 +688,11 @@ define("antie/devices/device", [
                         xhr.onreadystatechange = null;
                         if (xhr.status >= 200 && xhr.status < 300) {
                             if (opts.onLoad) {
-                                opts.onLoad(xhr.responseText, xhr.status);
+                                opts.onLoad(xhr.responseText, xhr.status, self._getResponseHeadersFromXHR(xhr));
                             }
                         } else {
                             if (opts.onError) {
-                                opts.onError(xhr.responseText, xhr.status);
+                                opts.onError(xhr.responseText, xhr.status, self._getResponseHeadersFromXHR(xhr));
                             }
                         }
                     }
@@ -845,11 +860,11 @@ define("antie/devices/device", [
                 jsonpOptions = jsonpOptions || {};
                 if (configSupportsCORS(this.getConfig())) {
                     modifiedOpts = {
-                        onLoad: function onLoad(jsonResponse) {
+                        onLoad: function onLoad(jsonResponse, status, responseHeader) {
                             var json = jsonResponse
                                 ? self.decodeJson(jsonResponse)
                                 : {};
-                            opts.onSuccess(json);
+                            opts.onSuccess(json, status, responseHeader);
                         },
                         onError: opts.onError,
                         abortAfter: opts.abortAfter,
