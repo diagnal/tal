@@ -660,13 +660,15 @@ define("antie/devices/device", [
 
             _getResponseHeadersFromXHR: function(xhr){
                 var headers = xhr.getAllResponseHeaders();
-                headers = headers.split(/\n|\r|\r\n/g).reduce(function(a, b) {
-                    if (b.length) {
-                        var [ key, value ] = b.split(': ');
-                        a[key] = value;
-                    }
-                    return a;
-                }, {});
+                if(headers){
+                    headers = headers.split(/\n|\r|\r\n/g).reduce(function(a, b) {
+                        if (b.length) {
+                            var [ key, value ] = b.split(': ');
+                            a[key] = value;
+                        }
+                        return a;
+                    }, {});
+                }
                 return headers;
             },
 
@@ -690,7 +692,7 @@ define("antie/devices/device", [
                             }
                         } else {
                             if (opts.onError) {
-                                opts.onError(xhr.responseText, xhr.status,self._getResponseHeadersFromXHR(xhr));
+                                opts.onError(xhr.responseText, xhr.status, self._getResponseHeadersFromXHR(xhr));
                             }
                         }
                     }
