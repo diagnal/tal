@@ -663,7 +663,9 @@ define("antie/devices/device", [
                 if(headers){
                     headers = headers.split(/\n|\r|\r\n/g).reduce(function(a, b) {
                         if (b.length) {
-                            var [ key, value ] = b.split(': ');
+                            var x = b.split(': ');
+                            var key = x[0];
+                            var value = x[1];
                             a[key] = value;
                         }
                         return a;
